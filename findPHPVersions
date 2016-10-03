@@ -1,2 +1,8 @@
 #!/bin/bash
+# USAGE: findPHPVersions
+# DESCRIPTION:
+#	This is an admittedly crude script to go through the filesystem and
+#	find all versions of PHP that exist. This is useful to find where
+#	pre-compiled PHP interpreters that exist in packaged appliations.
+
 for x in $(find / -executable -type f -name php); do echo -e "\n[ $x ]\n`$x -v`"; done | less

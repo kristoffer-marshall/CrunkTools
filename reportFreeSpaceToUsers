@@ -1,0 +1,24 @@
+#!/bin/bash
+# This script finds large files in /home and emails the offending users
+# with a list of their largest files. This script can save you plenty of 
+# headaches when space is low. This script will work assuming the names 
+# of the user directories directly correspond to an email address.
+# Example: /home/john.doe = john.doe@example.com
+#
+# ARGUMENTS: None (configure below)
+ 
+FREESPACE_FILE=/root/.freespace # Just a temporary file
+EMAIL_DOMAIN='example.com'
+FROM_ADDRESS="$HOST-freespace@$EMAIL_DOMAIN"
+MINIMUM_SIZE='50M' # May need to change to strictly a number for some versions of find
+
+# Find all files larger than $MINIMUM_SIZE
+find /home -size +$MINIMUM_SIZE -printf '%k %p\n' 2> /dev/null | sort -nr | perl -ne 'if ( /^(\d+)\s+(.*$)/){$l=log($1+.1);$m=int($l/log(1024)); printf  ("%6.1f\t%s\t%25s  %s\n",($1/(2**(10*$m))),(("K","M","G","T","P")[$m]),"*"x (1.5*$l),$2);}' > $FREESPACE_FILE
+
+# Iterate through results, emailing each individual with a list of their large files
+for x in $(awk '{print $4}' $FREESPACE_FILE | cut -d'/' -f3 | sort | uniq); do
+   echo -e "Hello,\n\nThere is currently low disk space on $HOSTNAME. Please review the following files and remove them if they are no longer necessary to keep.\n\nThank you,\n\nRoot\n\n\n\n`fgrep $x $FREESPACE_FILE`" | mail $x@$EMAIL_DOMAIN -s"Low Free Space on $HOSTNAME" -- -f $FROM_ADDRESS
+done
+
+# Delete the temp file
+rm -f $FREESPACE_FILE

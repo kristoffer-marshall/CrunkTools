@@ -2,11 +2,15 @@
 # USAGE: watchFreeSpace
 #
 # TODO:
-#       * Arguments
-#               * SLEEPTIME
-#       * Execute stuff when free space hits a threshold
-#       * Trending to figure out when space will be free
-#       * Usage
+#	* Execute stuff when free space hits a threshold
+#	* Trending to figure out when space will be free
+#	* Usage
+#	* Show changes under 1MB
+#	* Print columns consistently aligned
+#		** Large changes in size can screw up alignment
+#	* Allow a program to be executed when a threshold is met			
+#		** Handle timeout
+#		** Multiple alert suppression
 
 SLEEPTIME=10
 MOUNTPOINT=/home
@@ -22,7 +26,7 @@ fi
 
 tcurrentFreetgrn='\e[0;32m' # Green
 tcurrentFreetred='\e[0;31m' # Red
-tcurrentFreetrst='\e[0m'    # TecurrentFreet Reset
+tcurrentFreetrst='\e[0m'    # Reset
 
 lastFree=0
 

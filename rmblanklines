@@ -1,1 +1,5 @@
+#!/bin/bash
+# USAGE EXAMPLE: cat file | rmblanklines
+# DESCRIPTION: Remove blank lines from input.
+
 sed -e '/^$/d' $1

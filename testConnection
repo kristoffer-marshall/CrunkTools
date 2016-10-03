@@ -13,6 +13,7 @@
 #     * Show usage
 #     * Ability to inverse logic, so show when a port is closed
 #     * Ability to keep the program running after email is sent
+#		* Use raw sockets instead
 
 trap '' HUP
 DEFAULT_EMAIL=youremail@example.com

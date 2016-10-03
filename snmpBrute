@@ -4,7 +4,7 @@ if [ "$#" = 0 ]
 then
    echo
    echo "Usage: $0 [-v] HOSTNAME STRINGFRAGMENT"
-   echo "snmpBrute: A tool to do a small \"brute force\" to find an SNMP query string."
+   echo "snmpBrute: A tool to brute force a SNMP query string."
    echo
    echo "  -v     print used (and failed) string."
    echo

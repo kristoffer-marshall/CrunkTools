@@ -1,0 +1,65 @@
+#!/bin/bash
+# USAGE: watchPort HOST PORT [CCEMAIL]
+# DESCRIPTION:
+#  This script will continuously attempt to open a TCP connection
+#  to the specified host and port. When the connection succeeds,
+#  an email will be sent out. This is especially useful in an 
+#	environment where someone else is doing your network change, 
+#	if you're testing something out, or if you want to watch 
+#	the state of a service or tunnel.
+#
+#  TODO:
+#     * Allow one to specify TIMEOUT and SLEEP_TIME via argument
+#     * Show usage
+#     * Ability to inverse logic, so show when a port is closed
+#     * Ability to keep the program running after email is sent
+#		* Ability to test without sending out an email
+#
+#	NOTES:
+#		This used to use netcat, but someone decided to create a 
+#		clone of the program and leave out original functionality.
+#
+
+
+trap '' HUP
+DEFAULT_EMAIL=emailaddress@example.com
+TIMEOUT=5
+SLEEP_TIME=10
+STATE_FILE="/home/$USER/.port-active"
+DATE_FORMAT='%Y%m%d %H:%m:%S'
+MAIL_TIMEOUT=5
+
+dest_host=localhost
+dest_port=25
+ccEmail=anotheraddress@example.com
+
+shortHostname=$(hostname -s)
+
+while true ; do
+   #nc -vzw$TIMEOUT `echo $dest_host $dest_port`
+   timeout $TIMEOUT bash -c "cat < /dev/null > /dev/tcp/$dest_host/$dest_port" &> /dev/null
+   if [ $? -eq 0 ] ; then
+      if [ ! -f "$STATE_FILE" ]; then
+         touch $STATE_FILE
+			# Logs a message to /var/log/messages or the journal
+         logger -t watchPort -p notice "$dest_host:$dest_port state: UP"
+         echo "$(date +"$DATE_FORMAT"): Changed state -> UP"
+         echo "We can hit $dest_host:$dest_port from $shortHostname now." | timeout $MAIL_TIMEOUT mail -s "Test success: $shortHostname -> $dest_host:$dest_port" $DEFAULT_EMAIL,$ccEmail
+      else
+         #echo "$(date +"$DATE_FORMAT"): UP"
+         echo -n '.'
+      fi
+   else
+      if [ -f "$STATE_FILE" ]; then
+         rm -f $STATE_FILE
+         logger -t watchPort -p notice "$dest_host:$dest_port: DOWN"
+         echo "$(date +"$DATE_FORMAT"): Changed state -> DOWN"
+         echo "We CANNOT hit $dest_host:$dest_port from $shortHostname any longer." | timeout $MAIL_TIMEOUT mail -s "Test fail: $shortHostname -> $dest_host:$dest_port" $DEFAULT_EMAIL,$ccEmail
+      else
+         #echo "$(date +"$DATE_FORMAT"): DOWN"
+         echo -n '.'
+      fi
+   fi  
+   sleep $SLEEP_TIME
+done
+
