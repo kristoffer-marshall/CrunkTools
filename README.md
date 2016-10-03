@@ -3,6 +3,7 @@ A bunch of useful Linux scripts. I have quite a few more that I'll be adding aft
 
 ## watchFreeSpace
 [![screenshot](https://github.com/kristoffer-marshall/CrunkTools/raw/master/screenshots/watchFreeSpace.png)]
+
 Allows one to watch the fluctuation of free space on a system. Flags are not yet supported. What you don't see in the example is that the output is colorized, so imagine green lines when space has been freed and red for used space.
 
 EXAMPLE:
