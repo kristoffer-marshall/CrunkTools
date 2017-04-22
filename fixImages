@@ -1,0 +1,54 @@
+#!/bin/bash
+# USAGE: fixImages
+# DESCRIPTION:
+#	This script will go through the current working directory and will
+#	locate some common image files. If the extension is non-existant
+#	or wrong, the script will fix it.
+
+
+IFS=$'\n'
+for x in $(ls); do
+   #y=$(echo $x | sed -e 's/\ /\\ /g' -e 's/(/\\(/g' -e 's/)/\\)/g')
+   y=$(printf '%q' "$x")
+   type=$(file -ib "$y")
+   extension=$(echo ${y##*.} | tr '[:upper:]' '[:lower:]')
+   #echo $type
+   case $type in
+      "image/"*)
+         case $type in
+            *jpeg*)
+               filetype="jpg"
+               ;;
+            *png*)
+               filetype="png"
+               ;;
+            *riff*)
+               filetype="riff"
+               ;;
+            *gif*)
+               filetype="gif"
+               ;;
+            *x-xcf*)
+               filetype="xcf"
+               ;;
+         esac
+         if [[ "$filetype" != "$extension" ]]; then
+            echo "$y: Type is $filetype but extension is $extension."
+            echo -e "\tmv $x ${y%.*}.$filetype"
+            mv $x ${y%.*}.$filetype
+         fi
+         #echo "$y: Type is $filetype but extension is $extension."
+         ;;
+      "application/octet-stream"*)
+         #echo "$y RIFF"
+         ;;
+      "cannot open"*)
+         #echo "$y doesn't exist: $type"
+         ;;
+      *)
+         #echo "$y: $type"
+         ;;
+      esac
+done
+
+# grep -vE "JPEG|PNG|RIFF|GIF"

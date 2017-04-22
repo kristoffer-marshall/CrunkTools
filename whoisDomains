@@ -1,0 +1,16 @@
+#!/bin/bash
+TIMEOUT=10
+for x in $(cat $1); do
+echo "Checking $x..."
+      result=$(timeout $TIMEOUT whois $x)
+      echo $result | grep -Eq 'No match|NOT FOUND|Not fo|AVAILABLE|No Data Fou|has not been regi|No entri|not found|No Match|No Object Found'
+      #echo $result | grep -E '^No match|^NOT FOUND|^Not fo|AVAILABLE|^No Data Fou|has not been regi|No entri'
+        #echo "RESULT: $?"
+      if [ $? -ne 0 ]; then
+        if [[ -z "${result// }" ]] ; then 
+                echo -e "\tTimeout"
+        else
+                echo -e "\t$x is taken."
+        fi
+      fi
+done

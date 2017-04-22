@@ -67,6 +67,10 @@ EXAMPLE:
 ## watchPort
 This script will continuously attempt to open a TCP connection to the specified host and port. When the connection succeeds, an email will be sent out. This is especially useful in an environment where someone else is doing your network change, if you're testing something out, or if you want to watch the state of a service or tunnel.
 
+## fixImages
+This script will go through the current working directory and will locate some common image files. If the extension is non-existant or wrong, the script will fix it.
 
+## whoisDomains
+Give this a script a filename with a bunch of domain names or enter domains line by line (then CTRL + D). The script will go through and try to determine if the domain is registered or not via whois and will report "example.com is taken." if the domain is in fact registered.
 
 

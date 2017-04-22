@@ -1,0 +1,59 @@
+#!/bin/bash
+
+DATE_FORMAT='%Y%m%d %H:%m:%S'
+
+IFS=$'\n'
+Green='\e[0;92m' # Green
+Red='\e[0;91m' # Red
+White='\e[0;97m' # White
+Cyan='\e[0;96m' # Cyan
+Reset='\e[0m'    # Reset
+
+
+if [ "$#" = 0 ] 
+then
+   echo
+   echo "Usage: $0 [-c] FILENAME"
+   echo "SPF Checker: A tool to check SPF records from a list of domains."
+   echo
+   echo "  -c     Print in CSV format."
+   echo
+   exit 1
+fi 
+
+if [ $1 = "-c" ]
+then
+   csvFormat=1
+   domainList=$2
+else
+	csvFormat=0
+   domainList=$1
+fi
+
+for domain in $(cat $domainList); do
+	if [ "$csvFormat" -ne "1" ]; then 
+		echo -e "${Cyan}$domain ${Reset}"
+	else
+		echo -n "`date +"$DATE_FORMAT"`,$domain,"
+	fi
+	#echo "Results: $digResults"
+	digResults=$(dig +short TXT $domain)
+
+	if [ "$csvFormat" -ne "1" ]; then 
+		echo $digResults | grep -i spf > /dev/null
+		if [ $? -eq 0 ]; then
+			echo -e "\t${Green}SPF exists:${White} `echo "$digResults" | grep -i 'v=spf' | sed -e 's/^"//' -e 's/"$//'`${White}"
+		else
+			echo -e "\t${Red}SPF does not exist.${Reset}"
+		fi
+		echo
+	else
+		echo $digResults | grep -i spf > /dev/null
+		if [ $? -eq 0 ]; then
+			echo "SPF exists,`echo "$digResults" | grep -i 'v=spf' | sed -e 's/^"//' -e 's/"$//'`"
+		else
+			echo "SPF does not exist,NULL"
+		fi
+	fi
+done
+
